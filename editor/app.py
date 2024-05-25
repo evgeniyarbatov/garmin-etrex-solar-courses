@@ -1,6 +1,5 @@
 import gpxpy
 import base64
-from io import BytesIO
 
 import streamlit as st
 
@@ -11,8 +10,8 @@ def create_download_link(gpx, distance):
     href = f'<a href="data:application/octet-stream;base64,{b64}" download="{distance}km.gpx">{distance}km.gpx</a>'
     return href
 
-def render_gpx_slits(gpx, points_per_file, lat, lng):
-  gpx_segments = split_gpx(gpx, points_per_file, lat, lng)
+def render_gpx_slits(gpx, points_per_file, start_lat, start_lng):
+  gpx_segments = split_gpx(gpx, points_per_file, start_lat, start_lng)
   for distance, gpx_segment in gpx_segments:
     st.markdown(create_download_link(gpx_segment, distance), unsafe_allow_html=True)
   
@@ -41,13 +40,23 @@ if uploaded_file is not None:
       ("Yes", "No"),
       index=0,
   )
-  lat, lng = None, None
+  start_lat, start_lng = None, None
   if start_choice == "Yes":
       st.info("Using GPX starting point")
-      render_gpx_slits(gpx, points_per_file, lat, lng)
   else:
-      lat = st.number_input("Start latitude:", value=1.3097970339490435, format="%.6f")
-      lng = st.number_input("Start longitude:", value=103.89455470068188, format="%.6f")
+      start_lat = st.number_input(
+        "Start latitude:", 
+        value=1.3097970339490435, 
+        format="%.6f",
+        step=0.000001,
+      )
+      start_lng = st.number_input(
+        "Start longitude:", 
+        value=103.89455470068188, 
+        format="%.6f",
+        step=0.000001,
+      )
       st.success("Using custom starting point")
-      render_gpx_slits(gpx, points_per_file, lat, lng)
+  
+  render_gpx_slits(gpx, points_per_file, start_lat, start_lng)
 

@@ -46,7 +46,7 @@ def find_closest_point(
         if distance < min_distance:
           min_distance = distance
           closest_point = point
-  return closest_point.latitude, closest_point.longitude
+  return str(closest_point.latitude), str(closest_point.longitude)
 
 def split_gpx(
   gpx, 
@@ -58,18 +58,23 @@ def split_gpx(
   distance = 0
   gpx_out, trkseg_out = create_gpx()
 
-  if start_lat is not None and start_lng is not None:
-    start_lng, start_lng = find_closest_point(gpx, start_lat, start_lng)
-    print(f"Closest point is: ({start_lng}, {start_lng})")
+  route_started = True
+  closest_lat, closest_lng = None, None
+  if start_lat != None and start_lng != None:
+    closest_lat, closest_lng = find_closest_point(gpx, start_lat, start_lng)
+    route_started = False
 
   for track in gpx.tracks:
     for segment in track.segments:
       for count, point in enumerate(segment.points, start=1):
         lat, lng = str(point.latitude), str(point.longitude)
 
-        if start_lat is not None and start_lng is not None:
-          if lat != start_lat and lng != start_lng:
-            continue
+        if start_lat != None and start_lng != None:
+          if lat == closest_lat and lng == closest_lng:
+            route_started = True
+
+        if not route_started:
+          continue
 
         if count > 1:
            prev_lat, prev_lng = str(segment.points[count-2].latitude), str(segment.points[count-2].longitude)
