@@ -20,19 +20,16 @@ if uploaded_file is not None:
   gpx_file = uploaded_file.read()
   gpx = gpxpy.parse(gpx_file)
 
-  st.write("Reverse direction?")
-
-  col1, col2, = st.columns(2)
-  with col1:
-    reverse_btn = st.button('Yes')
-  with col2:
-    dont_reverse_btn = st.button('No')
-
-  if reverse_btn:
+  reverse_direction_choice = st.radio(
+      "Reverse direction?",
+      ("Yes", "No"),
+      index=1,
+  )
+  if reverse_direction_choice == "Yes":
     gpx = reverse_gpx(gpx)
     st.success("GPX file reversed")
-  if dont_reverse_btn:
-     st.info("GPX file NOT reversed")
+  else:
+    st.info("GPX file NOT reversed")
 
   gpx_segments = split_gpx(gpx, points_per_file)
 
