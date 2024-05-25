@@ -3,6 +3,8 @@ from geopy.distance import geodesic
 import xml.dom.minidom
 from xml.etree.ElementTree import Element, SubElement, tostring
 
+START_TOLERANCE_METERS = 0.001
+
 def format_gpx(gpx, distance):
   gpx_file = xml.dom.minidom.parseString(
     tostring(gpx, encoding="unicode")
@@ -30,15 +32,44 @@ def reverse_gpx(gpx):
             segment.points.reverse()
     return gpx
 
-def split_gpx(gpx, points_per_file=200):
+def find_closest_point(
+  gpx,
+  start_lat=None,
+  start_lng=None,
+):
+  closest_point = None
+  min_distance = float('inf')
+  for track in gpx.tracks:
+    for segment in track.segments:
+      for point in segment.points:
+        distance = geodesic((point.latitude, point.longitude), (start_lat, start_lng)).meters
+        if distance < min_distance:
+          min_distance = distance
+          closest_point = point
+  return closest_point.latitude, closest_point.longitude
+
+def split_gpx(
+  gpx, 
+  points_per_file=200,
+  start_lat=None,
+  start_lng=None,
+):
   split_gpx_files = []
   distance = 0
   gpx_out, trkseg_out = create_gpx()
+
+  if start_lat is not None and start_lng is not None:
+    start_lng, start_lng = find_closest_point(gpx, start_lat, start_lng)
+    print(f"Closest point is: ({start_lng}, {start_lng})")
 
   for track in gpx.tracks:
     for segment in track.segments:
       for count, point in enumerate(segment.points, start=1):
         lat, lng = str(point.latitude), str(point.longitude)
+
+        if start_lat is not None and start_lng is not None:
+          if lat != start_lat and lng != start_lng:
+            continue
 
         if count > 1:
            prev_lat, prev_lng = str(segment.points[count-2].latitude), str(segment.points[count-2].longitude)

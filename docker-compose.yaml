@@ -1,11 +1,11 @@
 services:
-  backend:
+  editor:
     build:
-      context: ./backend
+      context: ./editor
       dockerfile: Dockerfile
-    container_name: "garmin-backend"
+    container_name: "gpx-editor"
     ports:
-      - 8501:8501
+      - 80:80
     networks:
       - default
     restart: unless-stopped
