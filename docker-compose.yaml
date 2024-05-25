@@ -1,7 +1,7 @@
 services:
   editor:
     build:
-      context: ./editor
+      context: ./
       dockerfile: Dockerfile
     container_name: "gpx-editor"
     ports:
