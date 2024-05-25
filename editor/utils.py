@@ -59,32 +59,37 @@ def split_gpx(
   gpx_out, trkseg_out = create_gpx()
 
   route_started = True
-  closest_lat, closest_lng = None, None
   if start_lat != None and start_lng != None:
-    closest_lat, closest_lng = find_closest_point(gpx, start_lat, start_lng)
     route_started = False
+    start_lat, start_lng = find_closest_point(gpx, start_lat, start_lng)
+
+  point_count = 0
+  prev_lat, prev_lng = None, None
 
   for track in gpx.tracks:
     for segment in track.segments:
-      for count, point in enumerate(segment.points, start=1):
+      for point in segment.points:
         lat, lng = str(point.latitude), str(point.longitude)
 
         if start_lat != None and start_lng != None:
-          if lat == closest_lat and lng == closest_lng:
+          if lat == start_lat and lng == start_lng:
             route_started = True
 
         if not route_started:
           continue
 
-        if count > 1:
-           prev_lat, prev_lng = str(segment.points[count-2].latitude), str(segment.points[count-2].longitude)
-           distance += geodesic((prev_lat, prev_lng), (lat, lng)).meters
-
-        if count % points_per_file == 0:
-          split_gpx_files.append(format_gpx(gpx_out, distance))
-          gpx_out, trkseg_out = create_gpx()
+        if point_count > 0:
+          if prev_lat != None and prev_lng != None:
+            distance += geodesic((prev_lat, prev_lng), (lat, lng)).meters
+  
+          if point_count % points_per_file == 0:
+            split_gpx_files.append(format_gpx(gpx_out, distance))
+            gpx_out, trkseg_out = create_gpx()
 
         SubElement(trkseg_out, "trkpt", attrib={"lat": lat, "lon": lng})
+
+        prev_lat, prev_lng = lat, lng
+        point_count += 1
 
   split_gpx_files.append(format_gpx(gpx_out, distance))
 
