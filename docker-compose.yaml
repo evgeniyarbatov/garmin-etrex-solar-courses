@@ -1,0 +1,15 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: "garmin-backend"
+    ports:
+      - 8501:8501
+    networks:
+      - default
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge
