@@ -1,6 +1,6 @@
-# GPX route editor
+# GPX Route Editor
 
-Support splitting large GPX files into smaller segments compatible with Polar and Garmin.
+Split large GPX file into smaller segments compatible with Polar and Garmin.
 
 ## Demo
 
