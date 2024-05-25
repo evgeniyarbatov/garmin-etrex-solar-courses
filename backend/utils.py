@@ -1,11 +1,16 @@
+from geopy.distance import geodesic
+
 import xml.dom.minidom
 from xml.etree.ElementTree import Element, SubElement, tostring
 
-def format_gpx(gpx):
+def format_gpx(gpx, distance):
   gpx_file = xml.dom.minidom.parseString(
     tostring(gpx, encoding="unicode")
   ).toprettyxml()
-  return gpx_file
+
+  distance = round(distance / 1000.0)
+
+  return (distance, gpx_file)
 
 def create_gpx():
   gpx = Element('gpx', {
@@ -27,19 +32,24 @@ def reverse_gpx(gpx):
 
 def split_gpx(gpx, points_per_file=200):
   split_gpx_files = []
+  distance = 0
   gpx_out, trkseg_out = create_gpx()
 
   for track in gpx.tracks:
     for segment in track.segments:
       for count, point in enumerate(segment.points, start=1):
-        if count % points_per_file == 0:
-          split_gpx_files.append(format_gpx(gpx_out))
+        lat, lng = str(point.latitude), str(point.longitude)
 
+        if count > 1:
+           prev_lat, prev_lng = str(segment.points[count-2].latitude), str(segment.points[count-2].longitude)
+           distance += geodesic((prev_lat, prev_lng), (lat, lng)).meters
+
+        if count % points_per_file == 0:
+          split_gpx_files.append(format_gpx(gpx_out, distance))
           gpx_out, trkseg_out = create_gpx()
 
-        lat, lng = str(point.latitude), str(point.longitude)
         SubElement(trkseg_out, "trkpt", attrib={"lat": lat, "lon": lng})
 
-  split_gpx_files.append(format_gpx(gpx_out))
+  split_gpx_files.append(format_gpx(gpx_out, distance))
 
   return split_gpx_files
