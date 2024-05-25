@@ -18,7 +18,7 @@ def render_gpx_slits(gpx, points_per_file, start_lat, start_lng):
 st.title('GPX Editor')
 
 uploaded_file = st.file_uploader("GPX file", type=["gpx"])
-points_per_file = st.selectbox("How many points per file?", [200, 500, 1000, 10000], index=0)
+points_per_file = st.selectbox("How many points per file?", [200, 500, 1000], index=0)
 
 if uploaded_file is not None:
   gpx_file = uploaded_file.read()
