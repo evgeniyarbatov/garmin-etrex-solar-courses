@@ -6,7 +6,9 @@ Split large GPX file into smaller segments compatible with Polar and Garmin.
 
 https://gpx-editor.streamlit.app
 
-## Dev
+## Run
+
+Run locally with:
 
 ```
 docker-compose up --build
