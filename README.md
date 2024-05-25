@@ -1,8 +1,12 @@
-# garmin-extrex-gpx
+# GPX route editor
 
-Splitting GPX files to render properly on Garmin Extrex
+Support splitting large GPX files into smaller segments compatible with Polar and Garmin.
 
-## Run
+## Demo
+
+https://gpx-editor.streamlit.app
+
+## Dev
 
 ```
 docker-compose up --build
